@@ -34,11 +34,15 @@ El jugador camina por una casa virtual (sala, cocina, cuarto, baño y habitació
 
 ## 🚀 Publicar en una página web
 
-No requiere compilación: es HTML + CSS + JS estático (Three.js por CDN). Cualquiera de estas opciones sirve:
+No requiere compilación: es HTML + CSS + JS estático (Three.js por CDN) con rutas relativas, listo para GitHub Pages (incluye `.nojekyll`).
 
-- **GitHub Pages**: sube el repo → *Settings → Pages → Deploy from branch* → rama `main`, carpeta `/ (root)`.
-- **Netlify / Vercel / Cloudflare Pages**: arrastra la carpeta o conecta el repo; sin comando de build.
-- **Servidor propio**: copia los archivos a cualquier hosting con HTTPS.
+**Activar GitHub Pages (1 minuto):**
+1. En el repo, ve a **Settings → Pages**.
+2. En *Build and deployment → Source*, elige **Deploy from a branch**.
+3. En *Branch*, selecciona `arena/45825abf-alerta-para-pacientes-con-alzh` (o `main` si ya fusionaste el juego) y carpeta `/ (root)` → **Save**.
+4. Espera ~1 minuto y abre: `https://vealvarezc.github.io/Alerta-para-pacientes-con-alzheimer/`
+
+Otras opciones: **Netlify / Vercel / Cloudflare Pages** (arrastra la carpeta o conecta el repo; sin comando de build) o cualquier hosting con HTTPS.
 
 > ⚠️ **HTTPS es obligatorio** para WebXR (gafas AR/VR) y para los sensores del móvil. `localhost` también vale para probar.
 
