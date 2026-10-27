@@ -39,6 +39,7 @@ export class BeltMonitor {
     this.lastAccel = 0;
     this.lastHeading = 0;
     this.spinSmooth = 0;
+    this._wasCollided = false;
     this.gait = 'Estable';
     this.moving = false;
     // ventana deslizante para marcha errática
@@ -127,8 +128,10 @@ export class BeltMonitor {
     this.spinSmooth += (Math.min(spinRate, 40) - this.spinSmooth) * Math.min(1, dt * 4);
     if (speed > 0.6) aMag = Math.max(aMag, this.spinSmooth * speed);
     const aRaw = aMag;
-    // colisión fuerte = pico de aceleración (golpe)
-    if (sample.collided) aMag = Math.max(aMag, 4 + sample.collidedSpeed * 2.2);
+    // golpe solo en el impacto inicial (no al empujar sostenido una pared)
+    const newHit = sample.collided && !this._wasCollided;
+    this._wasCollided = !!sample.collided;
+    if (newHit) aMag = Math.max(aMag, 4 + (sample.collidedSpeed || 0) * 2.2);
 
     const jerk = Math.abs(aMag - this.lastAccel) / dt;
     this.lastAccel = aMag;

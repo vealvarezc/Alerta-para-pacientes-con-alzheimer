@@ -9,6 +9,11 @@ import { Player } from './player.js';
 import { UI } from './ui.js';
 import { XRManager } from './xr.js';
 import { Game } from './game.js';
+import { APP_VERSION } from './config.js';
+
+console.log(`%cEquilibrio Seguro v${APP_VERSION}`, 'font-weight:bold;color:#6ee7a0');
+document.getElementById('version-tag').textContent = `v${APP_VERSION} · Web + móvil + AR/VR`;
+document.getElementById('hud-version').textContent = `v${APP_VERSION}`;
 
 const container = document.getElementById('scene-container');
 

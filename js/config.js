@@ -1,4 +1,5 @@
 // Configuración global del juego "Equilibrio Seguro"
+export const APP_VERSION = '1.4.0';
 export const CONFIG = {
   eyeHeight: 1.6,
   walkSpeed: 2.2,      // m/s
@@ -12,7 +13,7 @@ export const CONFIG = {
   // Sensibilidades del cinturón
   sensitivity: {
     baja:  { accel: 9.0, jerk: 46, erratic: 150, fallImpact: 16, recover: 6 },
-    media: { accel: 7.0, jerk: 34, erratic: 110, fallImpact: 13, recover: 4 },
+    media: { accel: 8.0, jerk: 40, erratic: 125, fallImpact: 13, recover: 4 },
     alta:  { accel: 4.6, jerk: 23, erratic: 80,  fallImpact: 10, recover: 3 },
   },
   fallStillTime: 2.2,   // s de inmovilidad tras impacto para confirmar caída
