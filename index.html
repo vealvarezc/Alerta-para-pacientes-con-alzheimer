@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1b2340" />
+  <meta name="description" content="Equilibrio Seguro: juego mixed reality con cinturón inteligente que detecta movimientos bruscos, caídas y marcha errática. Web, móvil y gafas AR/VR." />
+  <title>Equilibrio Seguro · Cinturón Inteligente MR</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icon.svg" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app">
+    <div id="scene-container"></div>
+    <div id="vignette"></div>
+    <div id="flash"></div>
+
+    <!-- ============ HUD ============ -->
+    <div id="hud" class="hidden">
+      <div id="topbar">
+        <div id="objective-box">
+          <span id="objective-label">Ruta guiada</span>
+          <span id="objective-target">Ve al punto 1 · Cocina</span>
+        </div>
+        <div id="top-stats">
+          <span id="hud-timer">00:00</span>
+          <span id="hud-score">★ 100</span>
+        </div>
+      </div>
+
+      <div id="checkpoint-tracker"></div>
+
+      <div id="belt-panel">
+        <div class="belt-head">
+          <div id="belt-dome"><div id="belt-led"></div></div>
+          <div>
+            <div class="belt-title">Cinturón Guardián</div>
+            <div id="belt-status" class="ok">● Estable</div>
+          </div>
+        </div>
+        <div class="belt-grid">
+          <div><small>Velocidad</small><b id="belt-speed">0.0 m/s</b></div>
+          <div><small>Pasos</small><b id="belt-steps">0</b></div>
+          <div><small>Marcha</small><b id="belt-gait">Estable</b></div>
+          <div><small>Distancia</small><b id="belt-dist">0 m</b></div>
+        </div>
+        <div class="stability-row">
+          <small>Estabilidad</small>
+          <div id="stability-bar"><div id="stability-fill"></div></div>
+          <b id="stability-num">100</b>
+        </div>
+        <div class="belt-btns">
+          <button id="btn-trip" class="mini-btn" title="Simular tropiezo (T)">Simular tropiezo</button>
+          <button id="btn-fall" class="mini-btn danger" title="Probar alerta de caída (C)">Probar caída</button>
+        </div>
+      </div>
+
+      <div id="alert-feed"></div>
+      <div id="banner" class="hidden"></div>
+
+      <canvas id="minimap" width="220" height="160"></canvas>
+
+      <div id="hud-buttons">
+        <button id="btn-mute" class="icon-btn" title="Sonido (M)">🔊</button>
+        <button id="btn-help" class="icon-btn" title="Ayuda (H)">❓</button>
+        <button id="btn-xr-hud" class="icon-btn hidden" title="Entrar en XR">🥽</button>
+        <button id="btn-exit" class="icon-btn" title="Salir al menú">✕</button>
+      </div>
+
+      <div id="route-arrow"><div id="route-arrow-glyph">➤</div><span id="route-arrow-dist">0 m</span></div>
+
+      <div id="joystick"><div id="stick"></div></div>
+      <div id="touch-hint">Arrastra a la derecha para mirar · Palanca izquierda para caminar</div>
+    </div>
+
+    <!-- ============ FALL MODAL ============ -->
+    <div id="fall-modal" class="modal hidden">
+      <div class="modal-card danger-card">
+        <div class="siren">🚨</div>
+        <h2>¡Posible caída detectada!</h2>
+        <p>El cinturón detectó un impacto seguido de inmovilidad.<br />¿Te encuentras bien?</p>
+        <div id="fall-countdown">12</div>
+        <button id="btn-imok" class="big-btn ok">Estoy bien ✓</button>
+        <button id="btn-sos" class="big-btn danger">Avisar al cuidador</button>
+      </div>
+    </div>
+
+    <!-- ============ MENU ============ -->
+    <div id="menu" class="modal">
+      <div class="modal-card menu-card">
+        <h1>🏠 Equilibrio Seguro</h1>
+        <p class="subtitle">Juego <b>mixed reality</b> con <b>cinturón inteligente</b>: camina por la casa, el cinturón vigila tus movimientos y te alerta ante movimientos bruscos, caídas o marcha errática.</p>
+        <div class="menu-cols">
+          <img src="assets/cinturon.jpg" alt="Cinturón inteligente Guardián" id="belt-photo" />
+          <div class="menu-opts">
+            <label>Modo de juego</label>
+            <div class="seg" id="seg-mode">
+              <button data-v="ruta" class="active">🗺️ Ruta guiada</button>
+              <button data-v="libre">🚶 Paseo libre</button>
+            </div>
+            <label>Sensibilidad del cinturón</label>
+            <div class="seg" id="seg-sens">
+              <button data-v="baja">Baja</button>
+              <button data-v="media" class="active">Media</button>
+              <button data-v="alta">Alta</button>
+            </div>
+            <label>Cómo jugar</label>
+            <div class="play-btns">
+              <button id="btn-play" class="big-btn">▶ Jugar en pantalla</button>
+              <button id="btn-ar" class="big-btn xr">🥽 Entrar en AR</button>
+              <button id="btn-vr" class="big-btn xr">🕶️ Entrar en VR</button>
+            </div>
+            <p id="xr-msg" class="dim"></p>
+            <button id="btn-sensors" class="mini-btn">📱 Activar sensores del móvil</button>
+            <p class="dim small">PC: <b>WASD/flechas</b> + ratón · <b>Shift</b> correr · <b>T</b> tropiezo · <b>C</b> probar caída. Móvil: palanca + arrastrar para mirar.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ HELP ============ -->
+    <div id="help" class="modal hidden">
+      <div class="modal-card">
+        <h2>❓ Cómo jugar</h2>
+        <ul class="help-list">
+          <li>🎯 <b>Ruta guiada:</b> sigue la flecha y visita los 6 puntos de la casa en orden.</li>
+          <li>🛋️ La casa tiene sala, cocina, habitaciones, baño, muebles, 2 personas y mascotas (🐶 Max y 🐈 Mishi). ¡No los atropelles!</li>
+          <li>🟤 <b>Cinturón Guardián:</b> mide tu velocidad, estabilidad y forma de caminar.</li>
+          <li>⚠️ <b>Movimiento brusco:</b> frenar o girar de golpe baja tu estabilidad.</li>
+          <li>🌀 <b>Marcha errática:</b> caminar en zigzag rápido activa la alerta (pruébalo a propósito).</li>
+          <li>🧸 <b>Peligros:</b> juguetes, suelo mojado y la mascota que se cruza. Si vas rápido, tropiezas; si tu estabilidad está baja, puedes caer.</li>
+          <li>🚨 <b>Caída:</b> confirma “Estoy bien” antes de que termine la cuenta atrás o se avisará al cuidador.</li>
+          <li>🥽 <b>AR/VR:</b> necesitas un navegador con WebXR (Chrome/Edge en Android o visor Meta Quest) y conexión HTTPS. En AR la casa se ve como holograma sobre tu espacio real.</li>
+          <li>📱 En móvil, activa los sensores para que el cinturón use el acelerómetro real.</li>
+        </ul>
+        <button id="btn-help-close" class="big-btn">Entendido</button>
+      </div>
+    </div>
+
+    <!-- ============ RESULTS ============ -->
+    <div id="end" class="modal hidden">
+      <div class="modal-card">
+        <h2 id="end-title">🏁 ¡Ruta completada!</h2>
+        <p id="end-sub" class="subtitle"></p>
+        <div id="end-stats"></div>
+        <div class="play-btns">
+          <button id="btn-again" class="big-btn">🔁 Jugar otra vez</button>
+          <button id="btn-tomenu" class="big-btn ghost">Menú principal</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="hidden"></div>
+  </div>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

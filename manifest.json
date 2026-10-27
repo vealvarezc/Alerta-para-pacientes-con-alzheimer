@@ -1,0 +1,15 @@
+{
+  "name": "Equilibrio Seguro · Cinturón Inteligente MR",
+  "short_name": "Equilibrio Seguro",
+  "description": "Juego mixed reality con cinturón inteligente que detecta movimientos bruscos, caídas y marcha errática.",
+  "lang": "es",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#141a33",
+  "theme_color": "#1b2340",
+  "icons": [
+    { "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
