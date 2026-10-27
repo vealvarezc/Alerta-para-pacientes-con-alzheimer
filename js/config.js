@@ -11,9 +11,9 @@ export const CONFIG = {
   checkpointRadius: 1.4,
   // Sensibilidades del cinturón
   sensitivity: {
-    baja:  { accel: 8.5, jerk: 42, erratic: 150, fallImpact: 22, recover: 6 },
-    media: { accel: 6.0, jerk: 30, erratic: 110, fallImpact: 18, recover: 4 },
-    alta:  { accel: 4.2, jerk: 20, erratic: 80,  fallImpact: 14, recover: 3 },
+    baja:  { accel: 9.0, jerk: 46, erratic: 150, fallImpact: 16, recover: 6 },
+    media: { accel: 7.0, jerk: 34, erratic: 110, fallImpact: 13, recover: 4 },
+    alta:  { accel: 4.6, jerk: 23, erratic: 80,  fallImpact: 10, recover: 3 },
   },
   fallStillTime: 2.2,   // s de inmovilidad tras impacto para confirmar caída
   sosCountdown: 12,     // s cuenta atrás modal de caída

@@ -128,6 +128,7 @@ export class Game {
       this.state = 'fall';
       this.fallLeft = CONFIG.sosCountdown;
       this.player.stunned = 9999;
+      if (document.pointerLockElement) document.exitPointerLock();
       this.ui.pushAlert('danger', `🚨 ${info.title}`, info.msg);
       this.ui.hurtFlash();
       this.ui.banner('🚨 ¡CAÍDA DETECTADA!', '', 2500);
@@ -184,12 +185,12 @@ export class Game {
     // --- colisiones fuertes ---
     if (this.player.collided && this.player.collidedSpeed > 1.5) {
       this.belt.registerCollision(this.player.collidedSpeed);
-      if (this.player.collidedSpeed > 3.4) this.ui.hurtFlash();
+      if (this.player.collidedSpeed > 1.9) this.ui.hurtFlash();
     }
 
     // --- obstáculos estáticos (solo si vas deprisa o inestable) ---
     const sp = this.player.speed;
-    if (sp > 2.4 && !this.belt.fallActive) {
+    if (sp > 1.85 && !this.belt.fallActive) {
       for (const o of this.world.obstacles) {
         const d = Math.hypot(this.player.pos.x - o.x, this.player.pos.z - o.z);
         if (d < o.r + 0.25) {
@@ -200,7 +201,7 @@ export class Game {
     }
     // --- la mascota se cruza ---
     const dog = this.actors.dogState;
-    if (dog.moving && sp > 2.0 && !this.belt.fallActive) {
+    if (dog.moving && sp > 1.85 && !this.belt.fallActive) {
       const d = Math.hypot(this.player.pos.x - dog.x, this.player.pos.z - dog.z);
       if (d < 0.8) this.belt.registerHazard('mascota', sp);
     }

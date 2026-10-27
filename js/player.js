@@ -83,12 +83,15 @@ export class Player {
     }
     const maxSpeed = sprint ? CONFIG.sprintSpeed : CONFIG.walkSpeed;
 
-    // --- integración con aceleración / fricción ---
+    // --- integracion con aceleracion humana realista (m/s2) ---
+    // Arrancar/parar con calma NO dispara el cinturon; los picos vienen
+    // de giros bruscos a velocidad, choques y tropiezos.
     const target = new THREE.Vector3(mx * maxSpeed, 0, mz * maxSpeed);
-    const rate = (mx !== 0 || mz !== 0) ? CONFIG.accelRate : CONFIG.friction;
-    this.vel.x += (target.x - this.vel.x) * Math.min(1, dt * rate / Math.max(maxSpeed, 1) * 2.2);
-    this.vel.z += (target.z - this.vel.z) * Math.min(1, dt * rate / Math.max(maxSpeed, 1) * 2.2);
-    if (mx === 0 && mz === 0 && this.vel.length() < 0.05) this.vel.set(0, 0, 0);
+    const accel = (mx !== 0 || mz !== 0) ? 2.8 : 4.0;
+    const dvx = target.x - this.vel.x, dvz = target.z - this.vel.z;
+    const dv = Math.hypot(dvx, dvz), maxDv = accel * dt;
+    if (dv <= maxDv) { this.vel.x = target.x; this.vel.z = target.z; }
+    else { this.vel.x += dvx / dv * maxDv; this.vel.z += dvz / dv * maxDv; }
 
     const preSpeed = Math.hypot(this.vel.x, this.vel.z);
     this.pos.x += this.vel.x * dt;

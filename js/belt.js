@@ -38,6 +38,7 @@ export class BeltMonitor {
     this.lastVel = { x: 0, z: 0 };
     this.lastAccel = 0;
     this.lastHeading = 0;
+    this.spinSmooth = 0;
     this.gait = 'Estable';
     this.moving = false;
     // ventana deslizante para marcha errática
@@ -111,7 +112,7 @@ export class BeltMonitor {
     if (this.stepAccum >= CONFIG.strideLength && speed > 0.3) {
       this.stepAccum = 0;
       this.steps++;
-      this.sound.step(speed > 3);
+      this.sound.step(speed > 1.8);
     }
 
     // aceleración y jerk (del movimiento del juego + sensor real)
@@ -123,7 +124,8 @@ export class BeltMonitor {
     // Aceleracion centripeta al girar: a = turnRate * speed
     const headingNow = sample.heading ?? 0;
     const spinRate = Math.abs(angDiff(headingNow, this.lastHeading)) / dt;
-    if (speed > 0.8) aMag = Math.max(aMag, spinRate * speed);
+    this.spinSmooth += (Math.min(spinRate, 40) - this.spinSmooth) * Math.min(1, dt * 4);
+    if (speed > 0.6) aMag = Math.max(aMag, this.spinSmooth * speed);
     const aRaw = aMag;
     // colisión fuerte = pico de aceleración (golpe)
     if (sample.collided) aMag = Math.max(aMag, 4 + sample.collidedSpeed * 2.2);
@@ -202,7 +204,7 @@ export class BeltMonitor {
     }
 
     // recuperación de estabilidad al caminar con calma
-    if (!this.fallActive && this.moving && speed < 2.6 && this.jerkSmooth < s.jerk * 0.5) {
+    if (!this.fallActive && this.moving && speed < 2.0 && this.jerkSmooth < s.jerk * 0.5) {
       this.stability = Math.min(100, this.stability + dt * s.recover);
     } else if (!this.fallActive && !this.moving) {
       this.stability = Math.min(100, this.stability + dt * s.recover * 0.7);
@@ -223,7 +225,7 @@ export class BeltMonitor {
     if (this.fallActive || this.cool.tropiezo > 0) return 'ignorado';
     this.cool.tropiezo = 2.0;
     const names = { juguete: 'juguetes en el suelo', mojado: 'suelo mojado', mascota: 'la mascota se cruzó' };
-    if (speed > 3.1 || this.stability < 30) {
+    if (speed > 1.9 || this.stability < 30) {
       this.stability = Math.max(0, this.stability - 20);
       this.sound.stumble();
       this.vibrate([120, 50, 120]);
@@ -240,14 +242,14 @@ export class BeltMonitor {
   // Colisión contra muebles/paredes
   registerCollision(speed) {
     if (this.fallActive) return;
-    if (speed > 3.4) {
+    if (speed > 1.9) {
       this.cool.tropiezo = 2.0;
       this.damageStability(18, 'choque');
       this.sound.stumble();
       this.vibrate(150);
       this.emit('tropiezo', { msg: `¡Choque contra un mueble a ${speed.toFixed(1)} m/s!` });
       if (this.stability < 25) this.triggerFall('Choque con estabilidad crítica');
-    } else if (speed > 1.5 && this.cool.brusco <= 0) {
+    } else if (speed > 0.9 && this.cool.brusco <= 0) {
       this.damageStability(4, 'roce');
       this.sound.click();
     }
