@@ -19,6 +19,7 @@
 </head>
 <body>
   <div id="app">
+    <video id="ar-video" playsinline autoplay muted></video>
     <div id="scene-container"></div>
     <div id="vignette"></div>
     <div id="flash"></div>
@@ -121,6 +122,7 @@
               <button id="btn-play" class="big-btn">▶ Jugar en pantalla</button>
               <button id="btn-ar" class="big-btn xr">🥽 Entrar en AR</button>
               <button id="btn-vr" class="big-btn xr">🕶️ Entrar en VR</button>
+              <button id="btn-cam-ar" class="big-btn ghost">📷 AR con cámara (sin gafas)</button>
             </div>
             <p id="xr-msg" class="dim"></p>
             <button id="btn-voice" class="mini-btn">🎙️ Activar comandos de voz</button>
@@ -145,6 +147,7 @@
           <li>🌀 <b>Marcha errática:</b> caminar en zigzag rápido activa la alerta (pruébalo a propósito).</li>
           <li>🧸 <b>Peligros:</b> juguetes, suelo mojado y la mascota que se cruza. Si vas rápido, tropiezas; si tu estabilidad está baja, puedes caer.</li>
           <li>🚨 <b>Caída:</b> confirma “Estoy bien” antes de que termine la cuenta atrás o se avisará al cuidador.</li>
+          <li>📷 <b>AR con cámara:</b> si no tienes gafas, usa este modo: verás tu habitación real con la casa como holograma. Mueve el móvil en vertical para mirar.</li>
           <li>🥽 <b>AR/VR:</b> necesitas un navegador con WebXR (Chrome/Edge en Android o visor Meta Quest) y conexión HTTPS. En AR la casa se ve como holograma sobre tu espacio real.</li>
           <li>📱 En móvil, activa los sensores para que el cinturón use el acelerómetro real.</li>
           <li>🎙️ <b>Voz:</b> activa el micrófono y di <b>«llamar al cuidador»</b>, <b>«ayuda»</b> o <b>«socorro»</b> para avisar a Ana. Si te caes, responde <b>«estoy bien»</b> o <b>«cuidador»</b>. Funciona en Chrome/Edge (PC, Android y algunas gafas).</li>

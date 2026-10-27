@@ -15,6 +15,8 @@ html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; background: 
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif; }
 #app { position: fixed; inset: 0; }
 #scene-container, #scene-container canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+#ar-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: none; }
+#ar-video.on { display: block; }
 .hidden { display: none !important; }
 
 /* ---------- overlays ---------- */

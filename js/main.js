@@ -10,6 +10,7 @@ import { UI } from './ui.js';
 import { XRManager } from './xr.js';
 import { Game } from './game.js';
 import { VoiceControl } from './voice.js';
+import { CameraAR } from './cameraAR.js';
 import { APP_VERSION } from './config.js';
 
 console.log(`%cEquilibrio Seguro v${APP_VERSION}`, 'font-weight:bold;color:#6ee7a0');
@@ -45,6 +46,7 @@ const player = new Player(scene, camera);
 const ui = new UI();
 const xr = new XRManager(renderer, scene, camera);
 const game = new Game({ ui, belt, player, world, actors, input, sound });
+const cameraAR = new CameraAR(scene, world, SKY);
 
 // ---------- comandos por voz ----------
 const micBtn = document.getElementById('btn-mic');
@@ -126,8 +128,21 @@ xr.onEnd = () => {
   ui.toast('Sesión XR terminada · sigues en pantalla');
 };
 
+async function enterCameraAR() {
+  try {
+    if (game.state !== 'playing') startGame();
+    sound.ensure();
+    await cameraAR.start();
+    ui.toast('AR con cámara: mueve el móvil en vertical para mirar · palanca o WASD para caminar', 4500);
+  } catch (err) {
+    console.warn('CameraAR:', err);
+    ui.toast('No se pudo abrir la cámara: ' + (err.message || err));
+  }
+}
+
 async function enterXR(mode) {
   try {
+    if (cameraAR.active) cameraAR.stop();
     if (game.state !== 'playing') startGame();
     sound.ensure();
     await xr.start(mode);
@@ -157,9 +172,10 @@ ui.onClick('btn-play', () => { sound.ensure(); sound.click(); startGame(); });
 ui.onClick('btn-ar', () => enterXR('ar'));
 ui.onClick('btn-vr', () => enterXR('vr'));
 ui.onClick('btn-xr-hud', () => enterXR(xrCaps.ar ? 'ar' : 'vr'));
+ui.onClick('btn-cam-ar', enterCameraAR);
 ui.onClick('btn-again', () => { sound.click(); startGame(); });
-ui.onClick('btn-tomenu', () => { sound.click(); game.toMenu(); });
-ui.onClick('btn-exit', () => { sound.click(); if (xr.isPresenting) xr.end(); game.toMenu(); });
+ui.onClick('btn-tomenu', () => { sound.click(); if (cameraAR.active) cameraAR.stop(); game.toMenu(); });
+ui.onClick('btn-exit', () => { sound.click(); if (xr.isPresenting) xr.end(); if (cameraAR.active) cameraAR.stop(); game.toMenu(); });
 ui.onClick('btn-help', () => { sound.click(); ui.openHelp(); });
 ui.onClick('btn-help-close', () => { sound.click(); ui.closeHelp(); });
 ui.onClick('btn-imok', () => { sound.click(); game.resolveFall(true); });
@@ -212,6 +228,7 @@ renderer.setAnimationLoop(() => {
   } else {
     const xrMove = xr.isPresenting ? xr.pollControllers() : null;
     player.update(dt, input, world, actors, xrMove);
+    if (cameraAR.active) cameraAR.update(player);
     actors.update(dt, player.pos);
     world.update(dt, t);
     game.update(dt);

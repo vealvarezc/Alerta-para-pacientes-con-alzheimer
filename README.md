@@ -61,6 +61,7 @@ python3 -m http.server 8080
 - En **AR** la casa se vuelve semitransparente (holograma) y tu caminar físico mueve al jugador 1:1; el cinturón analiza tu movimiento real.
 - En **VR** puedes combinar caminar físico (zona segura) con el stick del mando.
 - Si el navegador no soporta WebXR, los botones se deshabilitan y se juega en pantalla sin problema.
+- **¿Sin gafas?** Usa el modo **AR con cámara**: muestra tu habitación real con la casa como holograma y miras moviendo el móvil (el menú explica por qué los botones AR/VR están deshabilitados en tu dispositivo).
 
 ## 📁 Estructura
 

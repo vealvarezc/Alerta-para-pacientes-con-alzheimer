@@ -16,8 +16,18 @@ export class XRManager {
 
   async detect() {
     const out = { ar: false, vr: false, msg: '' };
+    const ua = (typeof navigator !== 'undefined' && navigator.userAgent) || '';
+    const isIOS = /iPad|iPhone|iPod/.test(ua) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const isMobile = /Mobi|Android/.test(ua);
     if (!('xr' in navigator)) {
-      out.msg = 'Este navegador no soporta WebXR. Usa Chrome/Edge en Android o un visor Quest.';
+      out.msg = isIOS
+        ? 'iPhone/iPad no soporta WebXR en ning\u00FAn navegador. Prueba el modo \U0001F4F7 AR con c\u00E1mara.'
+        : 'Este navegador no tiene WebXR. En PC usa Chrome/Edge; en m\u00F3vil, Chrome en Android.';
+      return out;
+    }
+    if (!window.isSecureContext) {
+      out.msg = 'WebXR requiere HTTPS (o localhost).';
       return out;
     }
     try {
@@ -26,13 +36,11 @@ export class XRManager {
         out.vr = await navigator.xr.isSessionSupported('immersive-vr').catch(() => false);
       }
     } catch { /* noop */ }
-    if (!window.isSecureContext) {
-      out.msg = 'WebXR requiere HTTPS (o localhost). Publica la app con HTTPS para usar AR/VR.';
-      out.ar = false; out.vr = false;
-    } else if (out.ar && out.vr) out.msg = 'WebXR listo: puedes jugar en AR, VR o pantalla.';
+    if (out.ar && out.vr) out.msg = 'WebXR listo: puedes jugar en AR, VR o pantalla.';
     else if (out.ar) out.msg = 'WebXR listo: modo AR disponible.';
     else if (out.vr) out.msg = 'WebXR listo: modo VR disponible.';
-    else out.msg = 'WebXR sin sesiones inmersivas aquí. Juega en pantalla o móvil.';
+    else if (isMobile) out.msg = 'Este m\u00F3vil no tiene WebXR/ARCore. Prueba el modo \U0001F4F7 AR con c\u00E1mara.';
+    else out.msg = 'Sin visor XR conectado: abre esta p\u00E1gina en unas Meta Quest o conecta el visor al PC.';
     return out;
   }
 
