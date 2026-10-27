@@ -1,5 +1,5 @@
 // Configuración global del juego "Equilibrio Seguro"
-export const APP_VERSION = '1.6.0';
+export const APP_VERSION = '1.7.0';
 export const CONFIG = {
   eyeHeight: 1.6,
   walkSpeed: 2.2,      // m/s

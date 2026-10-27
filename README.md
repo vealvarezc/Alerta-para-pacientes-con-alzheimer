@@ -30,7 +30,7 @@ El jugador camina por una casa virtual (sala, cocina, cuarto, baño y habitació
 | Plataforma | Moverse | Mirar | Correr | Extras |
 |---|---|---|---|---|
 | PC | WASD / flechas | Ratón (clic para capturar) o Q/E | Shift | T = tropiezo · C = probar caída · M = sonido · H = ayuda |
-| Móvil | Palanca izquierda | Arrastrar lado derecho | Palanca al máximo | Botones del panel del cinturón |
+| Móvil | Palanca izquierda | Giroscopio (mover el móvil) o arrastrar | Palanca al máximo | 🧭 giroscopio · ⛶ pantalla completa (auto) |
 | AR/VR | Caminar físicamente + stick del mando | Mover la cabeza | — | Botón 🥽 en el HUD |
 
 ## 🚀 Publicar en una página web

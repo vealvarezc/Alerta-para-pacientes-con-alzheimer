@@ -186,3 +186,11 @@ body.touch #voice-heard { bottom: 156px; }
   #banner { font-size: 15px; padding: 10px 16px; }
   #end-stats { grid-template-columns: 1fr 1fr; }
 }
+
+#btn-gyro { display: none; }
+body.touch #btn-gyro { display: inline-block; }
+#btn-gyro.live { border-color: var(--accent2); box-shadow: 0 0 10px rgba(110,231,160,.6); }
+@media (max-width: 760px) {
+  .icon-btn { width: 36px; height: 36px; font-size: 16px; border-radius: 10px; }
+  #hud-buttons { gap: 6px; }
+}

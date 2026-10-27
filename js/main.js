@@ -11,6 +11,7 @@ import { XRManager } from './xr.js';
 import { Game } from './game.js';
 import { VoiceControl } from './voice.js';
 import { CameraAR } from './cameraAR.js';
+import { GyroLook } from './gyro.js';
 import { APP_VERSION } from './config.js';
 
 console.log(`%cEquilibrio Seguro v${APP_VERSION}`, 'font-weight:bold;color:#6ee7a0');
@@ -47,6 +48,7 @@ const ui = new UI();
 const xr = new XRManager(renderer, scene, camera);
 const game = new Game({ ui, belt, player, world, actors, input, sound });
 const cameraAR = new CameraAR(scene, world, SKY);
+const gyroLook = new GyroLook(); // mirada movil en modo normal
 
 // ---------- comandos por voz ----------
 const micBtn = document.getElementById('btn-mic');
@@ -143,6 +145,7 @@ async function enterCameraAR() {
 async function enterXR(mode) {
   try {
     if (cameraAR.active) cameraAR.stop();
+    gyroLook.stop(); // en visor manda la cabeza, no el movil
     if (game.state !== 'playing') startGame();
     sound.ensure();
     await xr.start(mode);
@@ -167,15 +170,47 @@ async function enterXR(mode) {
 function startGame() {
   belt.setSensitivity(ui.sens);
   game.start(ui.mode);
+  // movil: mirada por giroscopio + intento de pantalla completa (gestos validos aqui)
+  if (input.isTouch() && !xr.isPresenting) {
+    gyroLook.start().catch(() => {});
+    try {
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    } catch { /* el boton de pantalla completa queda disponible */ }
+  }
+}
+
+function toggleFullscreen() {
+  try {
+    if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return; }
+    const el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => ui.toast('No se pudo activar la pantalla completa'));
+    else ui.toast('En iPhone: Compartir \u2192 A\u00F1adir a pantalla de inicio');
+  } catch { ui.toast('Pantalla completa no disponible aqu\u00ED'); }
 }
 ui.onClick('btn-play', () => { sound.ensure(); sound.click(); startGame(); });
 ui.onClick('btn-ar', () => enterXR('ar'));
 ui.onClick('btn-vr', () => enterXR('vr'));
 ui.onClick('btn-xr-hud', () => enterXR(xrCaps.ar ? 'ar' : 'vr'));
 ui.onClick('btn-cam-ar', enterCameraAR);
+const gyroBtn = document.getElementById('btn-gyro');
+gyroLook.onChange = (on) => gyroBtn.classList.toggle('live', on);
+gyroLook.onError = (msg) => ui.toast('\U0001F9ED ' + msg);
+ui.onClick('btn-gyro', async () => {
+  sound.ensure();
+  if (cameraAR.active) {
+    const on = await cameraAR.gyro.toggle().catch(() => false);
+    gyroBtn.classList.toggle('live', !!on);
+    if (!on) ui.toast('\U0001F9ED Giroscopio desactivado: arrastra para mirar');
+  } else {
+    await gyroLook.toggle().catch(() => {});
+  }
+});
+ui.onClick('btn-fs', () => { sound.ensure(); toggleFullscreen(); });
 ui.onClick('btn-again', () => { sound.click(); startGame(); });
-ui.onClick('btn-tomenu', () => { sound.click(); if (cameraAR.active) cameraAR.stop(); game.toMenu(); });
-ui.onClick('btn-exit', () => { sound.click(); if (xr.isPresenting) xr.end(); if (cameraAR.active) cameraAR.stop(); game.toMenu(); });
+ui.onClick('btn-tomenu', () => { sound.click(); if (cameraAR.active) cameraAR.stop(); gyroLook.stop(); game.toMenu(); });
+ui.onClick('btn-exit', () => { sound.click(); if (xr.isPresenting) xr.end(); if (cameraAR.active) cameraAR.stop(); gyroLook.stop(); game.toMenu(); });
 ui.onClick('btn-help', () => { sound.click(); ui.openHelp(); });
 ui.onClick('btn-help-close', () => { sound.click(); ui.closeHelp(); });
 ui.onClick('btn-imok', () => { sound.click(); game.resolveFall(true); });
@@ -229,6 +264,7 @@ renderer.setAnimationLoop(() => {
     const xrMove = xr.isPresenting ? xr.pollControllers() : null;
     player.update(dt, input, world, actors, xrMove);
     if (cameraAR.active) cameraAR.update(player);
+    else if (!xr.isPresenting && gyroLook.active) gyroLook.update(player);
     actors.update(dt, player.pos);
     world.update(dt, t);
     game.update(dt);

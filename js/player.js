@@ -19,7 +19,7 @@ export class Player {
     this.collidedSpeed = 0;
     this.stunned = 0;                  // sin control tras caída
     this.inXR = false;
-    this._lastHeadWorld = new THREE.Vector3();
+    this._lastHeadLocal = new THREE.Vector3();
     this._headInit = false;
   }
 
@@ -97,16 +97,18 @@ export class Player {
     this.pos.x += this.vel.x * dt;
     this.pos.z += this.vel.z * dt;
 
-    // --- caminar físico en XR: sumar desplazamiento del visor ---
+    // --- caminar fisico en XR: sumar desplazamiento del visor 1:1 ---
+    // OJO: se usa la pose LOCAL del visor (relativa al rig). Usar la posicion
+    // mundial crea retroalimentacion positiva (el rig se persigue a si mismo),
+    // el mundo "nada" y marea. Zona muerta anti-ruido + tope anti-saltos.
     if (this.inXR) {
-      const head = new THREE.Vector3();
-      this.camera.getWorldPosition(head);
-      if (!this._headInit) { this._lastHeadWorld.copy(head); this._headInit = true; }
-      const dx = head.x - this._lastHeadWorld.x;
-      const dz = head.z - this._lastHeadWorld.z;
-      // filtrar saltos irreales (teletransporte del tracking)
-      if (Math.hypot(dx, dz) < 1.0) { this.pos.x += dx; this.pos.z += dz; }
-      this._lastHeadWorld.copy(head);
+      const hx = this.camera.position.x, hz = this.camera.position.z;
+      if (!this._headInit) { this._lastHeadLocal.set(hx, 0, hz); this._headInit = true; }
+      const dx = hx - this._lastHeadLocal.x;
+      const dz = hz - this._lastHeadLocal.z;
+      const stepLen = Math.hypot(dx, dz);
+      if (stepLen > 0.0015 && stepLen < 0.3) { this.pos.x += dx; this.pos.z += dz; }
+      this._lastHeadLocal.set(hx, 0, hz);
     }
 
     // --- colisiones con el mundo ---
