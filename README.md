@@ -15,6 +15,7 @@ El jugador camina por una casa virtual (sala, cocina, cuarto, baño y habitació
 - **Casa 3D completa**: 5 habitaciones, muebles, TV encendida, 👩‍⚕️ cuidadora Ana, 👨 familiar Carlos, 🐶 perro Max y 🐈 gata Mishi.
 - **Tres formas de jugar**: pantalla (PC), móvil táctil y **gafas AR/VR vía WebXR** (en AR la casa se ve como holograma sobre tu espacio real).
 - **Sensores reales**: en móvil, el cinturón fusiona el acelerómetro del teléfono; en XR usa el movimiento físico de la cabeza.
+- **Comandos por voz** 🎙️: di «llamar al cuidador», «ayuda» o «socorro» para avisar a Ana (ella camina hacia ti); si te caes, la app pregunta en voz alta y puedes responder «estoy bien» o «cuidador». Requiere Chrome/Edge con micrófono.
 
 ## 🎮 Cómo jugar
 

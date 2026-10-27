@@ -9,6 +9,7 @@ import { Player } from './player.js';
 import { UI } from './ui.js';
 import { XRManager } from './xr.js';
 import { Game } from './game.js';
+import { VoiceControl } from './voice.js';
 import { APP_VERSION } from './config.js';
 
 console.log(`%cEquilibrio Seguro v${APP_VERSION}`, 'font-weight:bold;color:#6ee7a0');
@@ -44,6 +45,62 @@ const player = new Player(scene, camera);
 const ui = new UI();
 const xr = new XRManager(renderer, scene, camera);
 const game = new Game({ ui, belt, player, world, actors, input, sound });
+
+// ---------- comandos por voz ----------
+const micBtn = document.getElementById('btn-mic');
+const voiceBtn = document.getElementById('btn-voice');
+const voiceStatus = document.getElementById('voice-status');
+const voiceHeard = document.getElementById('voice-heard');
+let heardTimer = null;
+const voice = new VoiceControl({
+  onCommand: (cmd, phrase) => {
+    sound.click();
+    if (cmd === 'sos') {
+      if (game.state === 'fall') {
+        game.resolveFall(false);
+      } else if (game.state === 'playing') {
+        ui.pushAlert('info', '\U0001F4DE Cuidador avisado por voz', `Escuch\u00E9: \u00AB${phrase}\u00BB. Ana viene en camino (simulado).`);
+        ui.banner('\U0001F4DE \u00A1Ana viene en camino!', 'good', 2200);
+        ui.toast('\U0001F4DE Cuidador notificado por voz (simulaci\u00F3n)');
+        voice.speak('Avisando al cuidador. Ana viene en camino.');
+        actors.caregiver.target = { x: player.pos.x, z: player.pos.z };
+        actors.caregiver.waitT = 0;
+      } else {
+        ui.toast('\U0001F399\uFE0F Entra al juego para llamar al cuidador');
+      }
+    } else if (cmd === 'ok') {
+      if (game.state === 'fall') game.resolveFall(true);
+      else ui.toast('\U0001F49A \u00A1Qu\u00E9 bueno que est\u00E9s bien!');
+    }
+  },
+  onTranscript: (text, isFinal) => {
+    voiceHeard.classList.remove('hidden');
+    voiceHeard.textContent = isFinal ? `\U0001F399\uFE0F \u2713 ${text}` : `\U0001F399\uFE0F \u2026${text}`;
+    clearTimeout(heardTimer);
+    heardTimer = setTimeout(() => voiceHeard.classList.add('hidden'), isFinal ? 3500 : 1500);
+  },
+  onState: (state, detail) => {
+    micBtn.classList.toggle('live', state === 'listening');
+    micBtn.classList.toggle('denied', state === 'denied');
+    if (state === 'listening') {
+      voiceStatus.textContent = '\U0001F399\uFE0F Escuchando\u2026 di \u00ABllamar al cuidador\u00BB para pedir ayuda.';
+      voiceBtn.textContent = '\U0001F399\uFE0F Desactivar comandos de voz';
+      ui.toast('\U0001F399\uFE0F Voz activada: di \u00ABllamar al cuidador\u00BB');
+    } else if (state === 'off') {
+      voiceStatus.textContent = 'Di "llamar al cuidador" para pedir ayuda (Chrome/Edge).';
+      voiceBtn.textContent = '\U0001F399\uFE0F Activar comandos de voz';
+      voiceHeard.classList.add('hidden');
+    } else if (state === 'denied' || state === 'unsupported' || state === 'error') {
+      voiceStatus.textContent = (state === 'denied' ? '\U0001F6AB ' : '\u26A0\uFE0F ') + detail;
+      voiceBtn.textContent = '\U0001F399\uFE0F Activar comandos de voz';
+      ui.toast(detail, 3500);
+    }
+  },
+});
+game.voice = voice;
+function toggleVoice() { sound.ensure(); voice.toggle(); }
+ui.onClick('btn-voice', toggleVoice);
+ui.onClick('btn-mic', toggleVoice);
 
 player.spawn(-2.2, 2.8, 0.35);
 // fondo del menú: vista de la sala

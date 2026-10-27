@@ -16,6 +16,7 @@ export class Game {
     this.ui = deps.ui; this.belt = deps.belt; this.player = deps.player;
     this.world = deps.world; this.actors = deps.actors; this.input = deps.input;
     this.sound = deps.sound;
+    this.voice = deps.voice || null;
     this.state = 'menu';
     this.mode = 'ruta';
     this.time = 0;
@@ -134,11 +135,18 @@ export class Game {
       this.ui.banner('🚨 ¡CAÍDA DETECTADA!', '', 2500);
       this.ui.showFallModal();
       this.ui.setFallCount(this.fallLeft);
+      if (this.voice && this.voice.enabled) {
+        this.voice.speak('\u00A1Posible ca\u00EDda detectada! \u00BFTe encuentras bien? Responde estoy bien, o di cuidador para pedir ayuda.');
+      }
     }
   }
 
   resolveFall(ok, auto = false) {
     this.belt.resolveFall(ok);
+    if (this.voice && this.voice.enabled) {
+      this.voice.speak(ok ? 'Me alegro de que est\u00E9s bien. Camina con calma.'
+                           : 'Avisando al cuidador. Ana viene en camino.');
+    }
     this.player.stunned = 1.5;
     this.ui.hideFallModal();
     if (!ok) {

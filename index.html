@@ -70,6 +70,7 @@
 
       <div id="hud-buttons">
         <button id="btn-mute" class="icon-btn" title="Sonido (M)">🔊</button>
+        <button id="btn-mic" class="icon-btn" title="Comandos de voz">🎙️</button>
         <button id="btn-help" class="icon-btn" title="Ayuda (H)">❓</button>
         <button id="btn-xr-hud" class="icon-btn hidden" title="Entrar en XR">🥽</button>
         <button id="btn-exit" class="icon-btn" title="Salir al menú">✕</button>
@@ -80,6 +81,7 @@
       <div id="joystick"><div id="stick"></div></div>
       <div id="touch-hint">Arrastra a la derecha para mirar · Palanca izquierda para caminar</div>
       <div id="hud-version"></div>
+      <div id="voice-heard" class="hidden"></div>
     </div>
 
     <!-- ============ FALL MODAL ============ -->
@@ -91,6 +93,7 @@
         <div id="fall-countdown">12</div>
         <button id="btn-imok" class="big-btn ok">Estoy bien ✓</button>
         <button id="btn-sos" class="big-btn danger">Avisar al cuidador</button>
+        <p class="dim small">🎙️ Puedes responder por voz: «estoy bien» o «cuidador»</p>
       </div>
     </div>
 
@@ -120,6 +123,8 @@
               <button id="btn-vr" class="big-btn xr">🕶️ Entrar en VR</button>
             </div>
             <p id="xr-msg" class="dim"></p>
+            <button id="btn-voice" class="mini-btn">🎙️ Activar comandos de voz</button>
+            <p id="voice-status" class="dim small">Di "llamar al cuidador" para pedir ayuda (Chrome/Edge).</p>
             <button id="btn-sensors" class="mini-btn">📱 Activar sensores del móvil</button>
             <p class="dim small">PC: <b>WASD/flechas</b> + ratón · <b>Shift</b> correr · <b>T</b> tropiezo · <b>C</b> probar caída. Móvil: palanca + arrastrar para mirar.</p>
             <p id="version-tag" class="dim small"></p>
@@ -142,6 +147,7 @@
           <li>🚨 <b>Caída:</b> confirma “Estoy bien” antes de que termine la cuenta atrás o se avisará al cuidador.</li>
           <li>🥽 <b>AR/VR:</b> necesitas un navegador con WebXR (Chrome/Edge en Android o visor Meta Quest) y conexión HTTPS. En AR la casa se ve como holograma sobre tu espacio real.</li>
           <li>📱 En móvil, activa los sensores para que el cinturón use el acelerómetro real.</li>
+          <li>🎙️ <b>Voz:</b> activa el micrófono y di <b>«llamar al cuidador»</b>, <b>«ayuda»</b> o <b>«socorro»</b> para avisar a Ana. Si te caes, responde <b>«estoy bien»</b> o <b>«cuidador»</b>. Funciona en Chrome/Edge (PC, Android y algunas gafas).</li>
         </ul>
         <button id="btn-help-close" class="big-btn">Entendido</button>
       </div>

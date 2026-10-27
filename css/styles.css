@@ -164,6 +164,13 @@ body.touch #route-arrow { bottom: 110px; }
 #version-tag { margin: 4px 0 0; opacity: .8; }
 #hud-version { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%);
   font-size: 10px; color: rgba(154,163,199,.7); pointer-events: none; }
+#btn-mic.live { border-color: var(--accent2); box-shadow: 0 0 10px rgba(110,231,160,.6); }
+#btn-mic.denied { border-color: var(--danger); opacity: .6; }
+#voice-heard { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%);
+  background: rgba(20,40,28,.92); border: 1px solid var(--accent2); color: #d8ffe6;
+  padding: 6px 14px; border-radius: 999px; font-size: 13px; max-width: 92vw;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+body.touch #voice-heard { bottom: 156px; }
 
 @media (max-width: 760px) {
   .menu-cols { flex-direction: column; align-items: center; }
